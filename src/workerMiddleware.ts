@@ -1,9 +1,9 @@
 import { Connect, ResolvedConfig } from 'vite';
-import { getWorks, IMonacoEditorOpts, isCDN, resolveMonacoPath } from './index';
-import { IWorkerDefinition, languageWorksByLabel } from './lnaguageWork';
-const esbuild = require('esbuild');
+import { build } from 'rolldown';
 import * as fs from 'fs';
-import path = require('path');
+import * as path from 'path';
+import { getWorks, IMonacoEditorOpts, isCDN, resolveMonacoPath } from './index.js';
+import { IWorkerDefinition } from './languageWork.js';
 
 export function getFilenameByEntry(entry: string) {
   entry = path.basename(entry, 'js');
@@ -15,9 +15,9 @@ export const cacheDir = 'node_modules/.monaco/';
 export function getWorkPath(
   works: IWorkerDefinition[],
   options: IMonacoEditorOpts,
-  config: ResolvedConfig
+  config: ResolvedConfig,
 ) {
-  const workerPaths = {};
+  const workerPaths: Record<string, string> = {};
 
   for (const work of works) {
     if (isCDN(options.publicPath)) {
@@ -49,30 +49,33 @@ export function getWorkPath(
 export function workerMiddleware(
   middlewares: Connect.Server,
   config: ResolvedConfig,
-  options: IMonacoEditorOpts
+  options: IMonacoEditorOpts,
 ): void {
   const works = getWorks(options);
   // clear cacheDir
 
   if (fs.existsSync(cacheDir)) {
-    fs.rmdirSync(cacheDir, { recursive: true, force: true } as fs.RmDirOptions);
+    fs.rmSync(cacheDir, { recursive: true, force: true });
   }
 
   for (const work of works) {
     middlewares.use(
       config.base + options.publicPath + '/' + getFilenameByEntry(work.entry),
-      function (req, res, next) {
+      async function (req, res, next) {
         if (!fs.existsSync(cacheDir + getFilenameByEntry(work.entry))) {
-          esbuild.buildSync({
-            entryPoints: [resolveMonacoPath(work.entry)],
-            bundle: true,
-            outfile: cacheDir + getFilenameByEntry(work.entry),
+          await build({
+            input: resolveMonacoPath(work.entry),
+            output: {
+              file: cacheDir + getFilenameByEntry(work.entry),
+              format: 'iife',
+              name: 'monacoWorker',
+            },
           });
         }
         const contentBuffer = fs.readFileSync(cacheDir + getFilenameByEntry(work.entry));
         res.setHeader('Content-Type', 'text/javascript');
         res.end(contentBuffer);
-      }
+      },
     );
   }
 }

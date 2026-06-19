@@ -1,12 +1,21 @@
 {
-  "name": "vite-plugin-monaco-editor",
-  "version": "1.1.0",
-  "description": "A vite plugin for the Monaco Editor",
+  "name": "@dvaji/vite-plugin-monaco-editor",
+  "version": "2.0.0",
+  "description": "A vite plugin for the Monaco Editor (Vite 8 fork)",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "tsc",
-    "prepublish": "npm run copy:cdn",
+    "prepublishOnly": "npm run copy:cdn",
     "test:build": "npm run build && vite build --config test/vite.config.js",
     "test:dev": "npm run build && vite --config test/vite.config.js",
     "test:preview": "vite preview --config test/vite.config.js",
@@ -17,34 +26,50 @@
     "dist",
     "cdn"
   ],
-  "author": "china-bin",
+  "author": "dvaji",
+  "contributors": [
+    "china-bin (original author)"
+  ],
   "license": "MIT",
   "keywords": [
     "vite-plugin",
     "monaco",
-    "editor"
+    "editor",
+    "vite-8",
+    "rolldown"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/vdesjs/vite-plugin-monaco-editor"
+    "url": "https://github.com/dvaJi/vite-plugin-monaco-editor"
+  },
+  "homepage": "https://github.com/dvaJi/vite-plugin-monaco-editor#readme",
+  "bugs": {
+    "url": "https://github.com/dvaJi/vite-plugin-monaco-editor/issues"
   },
   "publishConfig": {
+    "access": "public",
     "registry": "https://registry.npmjs.org"
   },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "devDependencies": {
-    "@okikio/sharedworker": "^1.0.3",
-    "@types/fs-extra": "^9.0.13",
-    "@types/node": "^16.4.13",
-    "@vitejs/plugin-vue": "^1.4.0",
-    "@vue/compiler-sfc": "^3.1.5",
-    "fs-extra": "^10.0.0",
-    "http-server": "^13.0.2",
-    "monaco-editor": "^0.33.0",
-    "monaco-graphql": "^0.4.4",
-    "typescript": "^4.3.5",
-    "vite": "^2.4.4",
-    "vue": "^3.1.5",
-    "vue-router": "^4.0.12"
+    "@okikio/sharedworker": "^1.1.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.9.3",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vue/compiler-sfc": "^3.5.38",
+    "fs-extra": "^11.3.5",
+    "http-server": "^14.1.1",
+    "monaco-editor": "^0.55.1",
+    "monaco-graphql": "2.0.0-canary-f648417e.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vue": "^3.5.38",
+    "vue-router": "^5.1.0"
+  },
+  "dependencies": {
+    "rolldown": "^1.1.2"
   },
   "peerDependencies": {
     "monaco-editor": ">=0.33.0"

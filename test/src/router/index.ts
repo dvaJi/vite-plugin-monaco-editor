@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
-  { path: '/', component: () => import('../mona/Editor.vue') },
-  { path: '/sub', component: () => import('../mona/Editor.vue') },
-  { path: '/home/test', component: () => import('../mona/Editor.vue') },
+  { path: '/', component: () => import('../monaco/Editor.vue') },
+  { path: '/sub', component: () => import('../monaco/Editor.vue') },
+  { path: '/home/test', component: () => import('../monaco/Editor.vue') },
 ];
 
 const router = createRouter({

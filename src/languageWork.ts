@@ -3,7 +3,6 @@ export interface IWorkerDefinition {
   entry: string;
 }
 
-
 export const languageWorkAttr: IWorkerDefinition[] = [
   {
     label: 'editorWorkerService',
@@ -27,13 +26,11 @@ export const languageWorkAttr: IWorkerDefinition[] = [
   },
 ];
 
-
 const languageWorksByLabel: { [language: string]: IWorkerDefinition } = {};
 languageWorkAttr.forEach(
-  (languageWork) => (languageWorksByLabel[languageWork.label] = languageWork)
+  (languageWork) => (languageWorksByLabel[languageWork.label] = languageWork),
 );
 
-export {languageWorksByLabel}
+export { languageWorksByLabel };
 
-
-export type EditorLanguageWorks = 'css' | 'html' | 'json' | 'typescript' | 'editorWorkerService'
+export type EditorLanguageWorks = 'css' | 'html' | 'json' | 'typescript' | 'editorWorkerService';

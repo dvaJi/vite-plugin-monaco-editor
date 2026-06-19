@@ -1,5 +1,3 @@
-const fse = require("fs-extra")
+import fse from 'fs-extra';
 
-fse.copySync("test/dist/a/monacoeditorwork", "cdn", {
-    
-})
+fse.copySync('test/dist/a/monacoeditorwork', 'cdn');

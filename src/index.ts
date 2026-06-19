@@ -1,10 +1,13 @@
 import { HtmlTagDescriptor, Plugin, ResolvedConfig } from 'vite';
 import * as path from 'path';
 import * as fs from 'fs';
+import { createRequire } from 'module';
+import { build } from 'rolldown';
 
-import { EditorLanguageWorks, IWorkerDefinition, languageWorksByLabel } from './lnaguageWork';
-import { workerMiddleware, cacheDir, getFilenameByEntry, getWorkPath } from './workerMiddleware';
-const esbuild = require('esbuild');
+import { EditorLanguageWorks, IWorkerDefinition, languageWorksByLabel } from './languageWork.js';
+import { workerMiddleware, cacheDir, getFilenameByEntry, getWorkPath } from './workerMiddleware.js';
+
+const require = createRequire(import.meta.url);
 
 /**
  * Return a resolved path for a given Monaco file.
@@ -19,7 +22,7 @@ export function resolveMonacoPath(filePath: string): string {
 
 export function getWorks(options: IMonacoEditorOpts) {
   let works: IWorkerDefinition[] = options.languageWorkers.map(
-    (work) => languageWorksByLabel[work]
+    (work) => languageWorksByLabel[work],
   );
 
   works.push(...options.customWorkers);
@@ -77,7 +80,7 @@ export default function monacoEditorPlugin(options: IMonacoEditorOpts): Plugin {
   let resolvedConfig: ResolvedConfig;
 
   return {
-    name: 'vite-plugin-moncao-editor',
+    name: 'vite-plugin-monaco-editor',
     configResolved(getResolvedConfig) {
       resolvedConfig = getResolvedConfig;
     },
@@ -125,8 +128,8 @@ export default function monacoEditorPlugin(options: IMonacoEditorOpts): Plugin {
       return descriptor;
     },
 
-    writeBundle() {
-      // 是cdn地址并且没有强制构建worker cdn则返回
+    async writeBundle() {
+      // Skip if using a CDN path and CDN worker build is not forced
       if (isCDN(publicPath) && !forceBuildCDN) {
         return;
       }
@@ -137,13 +140,13 @@ export default function monacoEditorPlugin(options: IMonacoEditorOpts): Plugin {
         ? options.customDistPath(
             resolvedConfig.root,
             resolvedConfig.build.outDir,
-            resolvedConfig.base
+            resolvedConfig.base,
           )
         : path.join(
             resolvedConfig.root,
             resolvedConfig.build.outDir,
             resolvedConfig.base,
-            options.publicPath
+            options.publicPath,
           );
 
       //  console.log("distPath", distPath)
@@ -157,10 +160,13 @@ export default function monacoEditorPlugin(options: IMonacoEditorOpts): Plugin {
 
       for (const work of works) {
         if (!fs.existsSync(cacheDir + getFilenameByEntry(work.entry))) {
-          esbuild.buildSync({
-            entryPoints: [resolveMonacoPath(work.entry)],
-            bundle: true,
-            outfile: cacheDir + getFilenameByEntry(work.entry),
+          await build({
+            input: resolveMonacoPath(work.entry),
+            output: {
+              file: cacheDir + getFilenameByEntry(work.entry),
+              format: 'iife',
+              name: 'monacoWorker',
+            },
           });
         }
         const contentBuffer = fs.readFileSync(cacheDir + getFilenameByEntry(work.entry));

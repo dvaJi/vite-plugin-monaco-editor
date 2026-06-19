@@ -2,11 +2,13 @@
     "include": ["src"],
     "compilerOptions": {
       "outDir": "dist",
-      "target": "ES6",
-      "module": "commonjs",
-      "moduleResolution": "node",
+      "rootDir": "src",
+      "target": "ES2022",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
       "declaration": true,
+      "esModuleInterop": true,
+      "strict": false,
+      "skipLibCheck": true
     }
-    
   }
-  
